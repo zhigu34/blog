@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Linux System Security">
+<meta name="keywords" content="Security">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Security-02">
+<meta property="og:url" content="http://hexo.zhigu34.cn/2018/04/Security-02/index.html">
+<meta property="og:site_name" content="2ER0">
+<meta property="og:description" content="Linux System Security">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-28T05:00:15.232Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Security-02">
+<meta name="twitter:description" content="Linux System Security">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hexo.zhigu34.cn/2018/04/Security-02/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Security-02 | 2ER0</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">2ER0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Get up early,Stay up late</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/About/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hexo.zhigu34.cn/2018/04/Security-02/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhigu34">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://wx2.sinaimg.cn/large/67634321gy1fq2xzdhsqxg203k03kq2w.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="2ER0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Security-02
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+                
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-09T00:00:00+08:00">2018-04-09</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/Security-02/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2018/04/Security-02/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Linux System Security<br><a id="more"></a></p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br></pre></td><td class="code"><pre><span class="line">day02</span><br><span class="line">SElinux安全防护</span><br><span class="line">数据加密与解密</span><br><span class="line">扫描</span><br><span class="line">抓包</span><br><span class="line">协议分析软件的使用</span><br><span class="line"></span><br><span class="line">一、SElinux安全防护</span><br><span class="line">1.1 linux安全防护模式？ DAC   和 MAC</span><br><span class="line">1.2  SElinux介绍</span><br><span class="line">       selinux 保护的方式：多级别保护 MLS  和</span><br><span class="line">                                        只保护常用的服务targeted</span><br><span class="line">1.3  查看操作系统当前selinux的状态  ]<span class="comment">#sestatus</span></span><br><span class="line">       [root@db51 ~]<span class="comment"># getenforce</span></span><br><span class="line">       Permissive</span><br><span class="line"></span><br><span class="line">1.4 临时启动和禁用selinux</span><br><span class="line"><span class="comment"># setenforce   1</span></span><br><span class="line"><span class="comment"># setenforce   0</span></span><br><span class="line"></span><br><span class="line">1.5  永久启用或禁用selinux</span><br><span class="line"><span class="comment"># vim /etc/selinux/config</span></span><br><span class="line">enforcing   &lt;------ permissive  -------&gt; disabled</span><br><span class="line"></span><br><span class="line">1.6  selinux 使用</span><br><span class="line">1.6.1  查看安全上下文（给文件或目录打的标签）                      查看文件的  安全上下文  ls  -Z   文件名</span><br><span class="line">查看目录的  安全上下文  ls   -dZ   目录名</span><br><span class="line">查看进程的  安全上下文  ps   aux  -Z    | grep  -i  进程名</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  129  ls  -Z   /etc/hosts</span><br><span class="line">  133  ls -dZ  /etc</span><br><span class="line"></span><br><span class="line">  134  ps aux</span><br><span class="line">  135  ps aux    |   grep -i httpd</span><br><span class="line">  136  ps aux -Z | grep -i httpd</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">1.6.2 安全上下文的组成</span><br><span class="line">用户：角色：访问类型：选项</span><br><span class="line">system_u:object_r:net_conf_t:s0</span><br><span class="line">system_u:object_r:etc_t:s0</span><br><span class="line">system_u:system_r:httpd_t:s0</span><br><span class="line"></span><br><span class="line">1.6.3 常见的访问类型</span><br><span class="line">]<span class="comment"># ls -Z /bin/*</span></span><br><span class="line">]<span class="comment"># ls -Z /etc/*</span></span><br><span class="line"></span><br><span class="line">1.6.4  启用SELINUX之后的一般操作规律。</span><br><span class="line">创建新目录或新文件： 继承父目录的安全上下文。</span><br><span class="line">移动文件  ： 保持原有的访问类型不变</span><br><span class="line">复制文件   :  继承目标目录的安全上下文。</span><br><span class="line"></span><br><span class="line">1.6.5  修改文件的安全上下文</span><br><span class="line">]<span class="comment"># chcon -t  访问类型  文件名        //修改单个文件</span></span><br><span class="line">]<span class="comment"># chcon -R  -t  访问类型  目录名  //递归修改</span></span><br><span class="line"></span><br><span class="line">1.6.6  恢复文件的安全上下文</span><br><span class="line">]<span class="comment"># restorecon  文件名   //恢复单个文件</span></span><br><span class="line">]<span class="comment"># restorecon  -R    目录名   //递归恢复</span></span><br><span class="line"></span><br><span class="line">1.6.7   修改selinux布尔值 （功能开关）</span><br><span class="line">查看布尔值  getsebool   -a</span><br><span class="line">                   getsebool   -a   |  grep  -i   服务名</span><br><span class="line"></span><br><span class="line">修改布尔值  ]<span class="comment"># setsebool  -P   变量名   on|off</span></span><br><span class="line">                    ]<span class="comment"># setsebool  -P   变量名=1|0</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">在主机51上运行ftp服务，允许匿名用户上传和下载文件到系统的/var/ftp/sharedir目录里。</span><br><span class="line"></span><br><span class="line">  208  rpm  -q  vsftpd</span><br><span class="line">  209  yum -y install  vsftpd</span><br><span class="line">]<span class="comment"># sed -i    '29s/^#//'     /etc/vsftpd/vsftpd.conf</span></span><br><span class="line">]<span class="comment"># sed -n  '29p'   /etc/vsftpd/vsftpd.conf</span></span><br><span class="line">anon_upload_enable=YES</span><br><span class="line">]<span class="comment"># mkdir  /var/ftp/sharedir</span></span><br><span class="line">]<span class="comment"># chmod o+w /var/ftp/sharedir/</span></span><br><span class="line">]<span class="comment">#  systemctl  start  vsftpd</span></span><br><span class="line">cp  /etc/passwd   /var/ftp/sharedir/</span><br><span class="line">cp /etc/hosts  /var/ftp/sharedir/</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">setenforce  1    不允许匿名用户上传文件</span><br><span class="line"></span><br><span class="line">修改相关的bool值允许匿名用户上传文件</span><br><span class="line">setsebool   -P   ftpd_anon_write   on</span><br><span class="line">setsebool   -P   ftpd_full_access=1</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">在客户端访问ftp服务器</span><br><span class="line">]<span class="comment"># yum -y  install  ftp</span></span><br><span class="line">]<span class="comment">#  ftp   192.168.4.51</span></span><br><span class="line"><span class="built_in">cd</span>  目录            <span class="comment">#切换到ftp服务的目录下</span></span><br><span class="line">get 文件名        <span class="comment">#下载文件</span></span><br><span class="line">lcd   目录名      <span class="comment">#切换客户端的系统目录下</span></span><br><span class="line">put   文件名     <span class="comment">#上传文件</span></span><br><span class="line"></span><br><span class="line">启用selinux  设置允许51主机的网站服务使用8090端口</span><br><span class="line"></span><br><span class="line">根据selinux的日志提示信息，修改配置。</span><br><span class="line">]<span class="comment"># rpm -qa  | grep -i setroubleshoot</span></span><br><span class="line"></span><br><span class="line">]<span class="comment"># sed -i '42s/80/8090/' /etc/httpd/conf/httpd.conf</span></span><br><span class="line">]<span class="comment"># systemctl  restart httpd</span></span><br><span class="line"></span><br><span class="line">]<span class="comment"># grep setroubleshoot  /var/log/messages  |   tail   -1</span></span><br><span class="line"></span><br><span class="line">Apr  9 23:45:34 db51 setroubleshoot: SELinux is preventing /usr/sbin/httpd from name_bind access on the tcp_socket port 8090. For complete SELinux messages. run sealert -l 48f5ae98-72a4-41dd-9e68-6675755d949c</span><br><span class="line"></span><br><span class="line">显示具体的解决办法</span><br><span class="line">]<span class="comment">#sealert    -l    48f5ae98-72a4-41dd-9e68-6675755d949c</span></span><br><span class="line"></span><br><span class="line">]<span class="comment"># semanage port -a -t  http_port_t  -p  tcp 8090</span></span><br><span class="line"></span><br><span class="line">]<span class="comment"># systemctl  restart httpd</span></span><br><span class="line">[root@db51 html]<span class="comment"># netstat -utnalp  | grep :8090</span></span><br><span class="line">+++++++++++++++++++++++++++++</span><br><span class="line">二、数据加密与解密</span><br><span class="line">2.1 数据在传输过程中会遇到哪些风险？</span><br><span class="line">截获     ----&gt;   加密</span><br><span class="line">不可否认性/篡改     ----&gt;   数字签名 或 做完整性校验</span><br><span class="line"></span><br><span class="line">2.2 什么是加密？ 把明文 变成密文过程，一般由发送发负责加密</span><br><span class="line"></span><br><span class="line">2.3 什么解密？     把密文变成明文过程，一般有接收方负责解密</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2.4 数据加密方式及对应的算法</span><br><span class="line">对称加密：加密和解密数据时使用相同的计算规则 算法：DES  和 AES</span><br><span class="line"></span><br><span class="line">非对称加密： 加密和解密数据时使用不同的计算规则（使用密钥对）算法：RSA 和  DSA</span><br><span class="line">                      密钥对分为2个部分： 公钥 用来加密</span><br><span class="line">                                                        私钥 用来解密</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">2.4  什么是算法  ：加密或解密数据是时，使用的计算规则。</span><br><span class="line">                              可以是 口令  （123456）</span><br><span class="line">                              也可以是一串代码（密钥对）</span><br><span class="line"></span><br><span class="line">2.5 使用GPG工具加密</span><br><span class="line">[root@db51 html]<span class="comment"># which gpg</span></span><br><span class="line">/usr/bin/gpg</span><br><span class="line">[root@db51 html]<span class="comment"># rpm -qf /usr/bin/gpg</span></span><br><span class="line">gnupg2-2.0.22-3.el7.x86_64</span><br><span class="line">[root@db51 html]<span class="comment"># rpm -q gnupg2</span></span><br><span class="line">gnupg2-2.0.22-3.el7.x86_64</span><br><span class="line">[root@db51 html]<span class="comment"># gpg   --help</span></span><br><span class="line"></span><br><span class="line">命令格式：   gpg  &lt;选项&gt;  文件名</span><br><span class="line"></span><br><span class="line">在宿主机上添加2个用户并设置密码</span><br><span class="line">useradd  userA</span><br><span class="line">useradd  userB</span><br><span class="line"><span class="built_in">echo</span>  123456 |  passwd  --stdin   userA</span><br><span class="line"><span class="built_in">echo</span>  123456 |  passwd  --stdin   userB</span><br><span class="line">tty1:  ssh  -X   userA@localhost</span><br><span class="line">tty2:  ssh  -X   userB@localhost</span><br><span class="line"></span><br><span class="line">2.5.1 对称加密及解密</span><br><span class="line">-c 加密</span><br><span class="line">-d 解密</span><br><span class="line"></span><br><span class="line">userA -------&gt; userB</span><br><span class="line">发                      收</span><br><span class="line">userA:</span><br><span class="line">]<span class="comment">#md5sum  a.txt</span></span><br><span class="line">]<span class="comment">#gpg -c a.txt  (输入加密口令)</span></span><br><span class="line">]<span class="comment">#mv  a.txt.gpg   /tmp/</span></span><br><span class="line">userB:</span><br><span class="line">]<span class="comment">#gpg  -d  /tmp/a.txt.gpg   &gt;  ~/test.txt   （输入解密口令）</span></span><br><span class="line">]<span class="comment">#cat ~/test.txt</span></span><br><span class="line">]<span class="comment">#md5sum  ~/test.txt</span></span><br><span class="line"></span><br><span class="line">2.5.2 ------------------非对称加密及解密-------------------</span><br><span class="line">--gen-key  创建密钥对</span><br><span class="line">-e  加密</span><br><span class="line">-d  解密</span><br><span class="line">-a  --<span class="built_in">export</span>   导出公钥</span><br><span class="line">--import   导入公钥</span><br><span class="line"></span><br><span class="line">userA  -------&gt; userB</span><br><span class="line">发                      收</span><br><span class="line">加                      解</span><br><span class="line">公钥                   私钥</span><br><span class="line"></span><br><span class="line">dd  <span class="keyword">if</span>=/dev/zero  of=/test.txt  bs=1M  count=1000000</span><br><span class="line">userB:</span><br><span class="line">1  创建密钥对</span><br><span class="line">]$ rm  -rf  ~/.gnupg</span><br><span class="line">]$ gpg  --gen-key</span><br><span class="line">]$ ls ~/.gnupg/</span><br><span class="line">2  导出公钥 并传给发送</span><br><span class="line">]$ gpg -a --<span class="built_in">export</span></span><br><span class="line">]$ gpg -a --<span class="built_in">export</span>  &gt; /tmp/userB.pub</span><br><span class="line">userA:</span><br><span class="line">rm  -rf  ~/.gnupg</span><br><span class="line">1 导入公钥</span><br><span class="line">]$  gpg  --import   /tmp/userB.pub</span><br><span class="line">]$  ls ~/.gnupg/</span><br><span class="line">2 加密明文文件 并传给 接收方</span><br><span class="line">]$  tail  -3  /etc/passwd   &gt;  a.txt</span><br><span class="line">]$ cat a.txt</span><br><span class="line">]$ gpg  -e  -r   panglijing   a.txt</span><br><span class="line">]$ mv  a.txt.gpg   /tmp/</span><br><span class="line">3 接收方userb用户解密加密的文件</span><br><span class="line">]$  cat /tmp/a.txt.gpg</span><br><span class="line">]$ gpg -d /tmp/a.txt.gpg  &gt; ~/b.txt</span><br><span class="line"></span><br><span class="line">2.5.3 -----------------数据签名------------------</span><br><span class="line">签名作用： 验证文件完整性   实现不可否认性</span><br><span class="line">使用私钥签名</span><br><span class="line">使用公钥验证签名</span><br><span class="line">-b  创建签名文件</span><br><span class="line">--verify 验证签名文件</span><br><span class="line"></span><br><span class="line">userB用户使用私钥创建签名文件</span><br><span class="line">   42  head -4 /etc/passwd &gt; c.txt</span><br><span class="line">   43  cat c.txt</span><br><span class="line">   44  gpg -b c.txt   //创建签名文件 会自动调用自己的私钥做签名</span><br><span class="line">   45  ls c.txt.sig</span><br><span class="line">   48  mv c.txt*   /tmp/</span><br><span class="line">   ]$  gpg --fingerprint</span><br><span class="line">userA用户使用导入的userB 的公钥验证签名文件</span><br><span class="line">]$ cat  /tmp/c.txt</span><br><span class="line">]$ gpg --verify /tmp/c.txt.sig (文件内容和签名时一样 提示验证完好 反之提示损坏)</span><br><span class="line"></span><br><span class="line">++++++++++++++++++++++++++++++</span><br><span class="line">扫描 nmap</span><br><span class="line">]<span class="comment"># rpm -q  nmap  || yum  -y  install nmap</span></span><br><span class="line">]<span class="comment"># which   nmap</span></span><br><span class="line">]<span class="comment"># man  nmap   查看帮助信息</span></span><br><span class="line"></span><br><span class="line">namp 命令的语法格式?</span><br><span class="line">]<span class="comment"># nmap  [扫描的方式]   [选项]     &lt;ip地址&gt;</span></span><br><span class="line"></span><br><span class="line">扫描的方式 -sS  -sT   -sU   -sP</span><br><span class="line">选项  -A   -n    -p</span><br><span class="line"></span><br><span class="line">ip地址的表示方式</span><br><span class="line">]<span class="comment"># nmap     172.40.3.144</span></span><br><span class="line">]<span class="comment"># nmap     172.40.3.144-150</span></span><br><span class="line">]<span class="comment"># nmap     172.40.3.144,153,139</span></span><br><span class="line"></span><br><span class="line">]<span class="comment"># nmap  -sP 172.40.3.144</span></span><br><span class="line">]<span class="comment"># nmap  -sP  172.40.3.100</span></span><br><span class="line">]<span class="comment"># nmap  -A   172.40.3.144</span></span><br><span class="line"></span><br><span class="line">21     22      23         25        53      80      110     3306    3128   443</span><br><span class="line">FTP   SSH   telnet   smtp     dns   http     pop3  mysql  squid   https</span><br><span class="line"></span><br><span class="line">]<span class="comment">#nmap  -sS  -n  -p  80   172.40.3.144</span></span><br><span class="line">]<span class="comment"># nmap -sS  -n  -p  8090   192.168.4.51</span></span><br><span class="line">]<span class="comment">#nmap  -sS  -n  -p  21-22,80,3306   172.40.3.144</span></span><br><span class="line"></span><br><span class="line">执行命令 checkstus 可以自定义检查任意台主机上任意服务的运行状态</span><br><span class="line">]<span class="comment"># vim /usr/local/sbin/checkstus</span></span><br><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">port=<span class="variable">$1</span></span><br><span class="line"><span class="built_in">shift</span></span><br><span class="line"><span class="keyword">for</span>  ip   <span class="keyword">in</span>  $*</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">     nmap -sS -n  -p <span class="variable">$port</span>  <span class="string">"172.40.3.<span class="variable">$ip</span>"</span> | grep -q  open</span><br><span class="line">     <span class="keyword">if</span> [ $? -eq 0  ];<span class="keyword">then</span></span><br><span class="line">         <span class="built_in">echo</span> <span class="string">"172.40.3.<span class="variable">$ip</span>  <span class="variable">$port</span> is  open"</span></span><br><span class="line">     <span class="keyword">else</span></span><br><span class="line">         <span class="built_in">echo</span> <span class="string">"172.40.3.<span class="variable">$ip</span>  <span class="variable">$port</span> is  closed"</span></span><br><span class="line">     <span class="keyword">fi</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line">:wq</span><br><span class="line">]<span class="comment">#chmod  +x  /usr/local/sbin/checkstus</span></span><br><span class="line">]<span class="comment"># checkstus 3306  139 144  153 141</span></span><br><span class="line">++++++++++++++++++++++++++++++</span><br><span class="line">抓包tcpdump ：提取tcp数据的命令行工具</span><br><span class="line"></span><br><span class="line">命令格式  ]<span class="comment">#tcmpdump   [选项]    [过滤条件]</span></span><br><span class="line">*默认只抓从主机eth0接口进出的ip包</span><br><span class="line">*默认把抓到的包显示到屏幕上</span><br><span class="line"></span><br><span class="line">选项   -i  网络接口名  -A   -w   -r   -c  数字     //指定抓包个数</span><br><span class="line">过滤条件?</span><br><span class="line"></span><br><span class="line">]<span class="comment">#tcpdump  -i  br1   -A  －w   /tmp/a.cap</span></span><br><span class="line">]<span class="comment">#tcpdump   -A  －r   /tmp/a.cap</span></span><br><span class="line">]<span class="comment">#tcpdump  -i  br1   -A  -c   2</span></span><br><span class="line">]<span class="comment">#tcpdump  -i br1 -A  src 172.40.3.144  and  port  21</span></span><br><span class="line">]<span class="comment"># tcpdump  -i br1 -A  src 172.40.3.144 and  port 21</span></span><br><span class="line">]<span class="comment"># tcpdump  -i br1 -A  src 172.40.3.144 and  \(port 21  or  port 80\)</span></span><br><span class="line"></span><br><span class="line">在52邮件服务器上执行抓包命令：</span><br><span class="line">抓取发送邮件ip包   ]<span class="comment"># tcpdump  -i  eth0  -A  port 25</span></span><br><span class="line">抓取收送邮件ip包   ]<span class="comment"># tcpdump  -i  lo  -A  port 110</span></span><br><span class="line"></span><br><span class="line">  262  tcpdump  -i  lo  -A  port 110</span><br><span class="line"></span><br><span class="line">263  tcpdump  -i  lo  -A  -w /tmp/mail.cap  port 110</span><br><span class="line"></span><br><span class="line">  264  tcpdump  -A  -r /tmp/mail.cap</span><br><span class="line">  265  tcpdump  -A  -r /tmp/mail.cap | grep -i user</span><br><span class="line">  266  tcpdump  -A  -r /tmp/mail.cap | grep -i pass</span><br><span class="line"></span><br><span class="line">]<span class="comment"># scp /tmp/mail.cap   192.168.4.254:/tmp/</span></span><br><span class="line">++++++++++++++++++++++++++++++</span><br><span class="line">协议分析软件wireshark的使用 查看ip包的具体内容</span><br><span class="line">]<span class="comment"># yum -y install  wireshark-*</span></span><br><span class="line">[root@room9pc17 ~]<span class="comment"># rpm -qa  | grep -i wireshark</span></span><br><span class="line">wireshark-1.10.14-7.el7.x86_64</span><br><span class="line">wireshark-gnome-1.10.14-7.el7.x86_64</span><br><span class="line"></span><br><span class="line">telnet localhost  110</span><br><span class="line">：：1        ipv6</span><br><span class="line"> 127.0.0.1 ipv4</span><br><span class="line">打开软件？</span><br><span class="line">OSI参考模型        TCP/IP</span><br><span class="line">应用层                 应用层</span><br><span class="line">会话层</span><br><span class="line">表示层</span><br><span class="line">传输层                 传输层</span><br><span class="line">网络层                 网络层</span><br><span class="line">数据链路层</span><br><span class="line">物理层                 物理层</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>zhigu34</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://hexo.zhigu34.cn/2018/04/Security-02/" title="Security-02">http://hexo.zhigu34.cn/2018/04/Security-02/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Security/" <i class="fa fa-tag"></i> Security</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/Security-01/" rel="next" title="Security-01">
+                <i class="fa fa-chevron-left"></i> Security-01
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/Security-02-Selinux/" rel="prev" title="Security-02-SELINUX">
+                Security-02-SELINUX <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://wx2.sinaimg.cn/large/67634321gy1fq2xzdhsqxg203k03kq2w.gif"
+                alt="zhigu34" />
+            
+              <p class="site-author-name" itemprop="name">zhigu34</p>
+              <p class="site-description motion-element" itemprop="description">To Be Geek</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:zhigu34@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://plus.google.com/zhigu34" target="_blank" title="Google"><i class="fa fa-fw fa-google"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/zhigu34" target="_blank" title="Twitter"><i class="fa fa-fw fa-twitter"></i></a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.viosey.com/" title="Viosey" target="_blank">Viosey</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.nfz.moe/" title="neoFelhz" target="_blank">neoFelhz</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.jeyzhang.com/" title="JeyZhang" target="_blank">JeyZhang</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhigu34</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" rel="external nofollow" href="https://pages.coding.me"><b>Coding Pages</b></a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'A0txhlIyiHjgCzx5OcyTiw1L-gzGzoHsz',
+        appKey: 'uoUcP58XEVhRgFxFsbRRYNzo',
+        placeholder: 'Leave your comment here',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="集群：使用一组服务器提供相同的服务集群分类：LB:  一组服务器平均分摊客户端的多次连接请求HA:  主备模式 主是正在提供服务的主机 当主宕机后，备用主机自动接替服务。对客户端来说是透明的。HPC: 高计算集群 应用专业领域（航天、航空 勘探 科学计算 天气）">
+<meta name="keywords" content="Cluster">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LVS 负载均衡集群搭建">
+<meta property="og:url" content="http://hexo.zhigu34.cn/2018/04/LVS-负载均衡集群搭建/index.html">
+<meta property="og:site_name" content="2ER0">
+<meta property="og:description" content="集群：使用一组服务器提供相同的服务集群分类：LB:  一组服务器平均分摊客户端的多次连接请求HA:  主备模式 主是正在提供服务的主机 当主宕机后，备用主机自动接替服务。对客户端来说是透明的。HPC: 高计算集群 应用专业领域（航天、航空 勘探 科学计算 天气）">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2018-04-28T05:00:15.805Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="LVS 负载均衡集群搭建">
+<meta name="twitter:description" content="集群：使用一组服务器提供相同的服务集群分类：LB:  一组服务器平均分摊客户端的多次连接请求HA:  主备模式 主是正在提供服务的主机 当主宕机后，备用主机自动接替服务。对客户端来说是透明的。HPC: 高计算集群 应用专业领域（航天、航空 勘探 科学计算 天气）">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hexo.zhigu34.cn/2018/04/LVS-负载均衡集群搭建/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>LVS 负载均衡集群搭建 | 2ER0</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">2ER0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Get up early,Stay up late</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/About/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hexo.zhigu34.cn/2018/04/LVS-负载均衡集群搭建/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhigu34">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://wx2.sinaimg.cn/large/67634321gy1fq2xzdhsqxg203k03kq2w.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="2ER0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LVS 负载均衡集群搭建
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+                
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-18T12:13:00+08:00">2018-04-18</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/LVS-负载均衡集群搭建/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2018/04/LVS-负载均衡集群搭建/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>集群：使用一组服务器提供相同的服务<br>集群分类：<br>LB:  一组服务器平均分摊客户端的多次连接请求<br>HA:  主备模式 主是正在提供服务的主机 当主宕机后，备用主机自动接替服务。对客户端来说是透明的。<br>HPC: 高计算集群 应用专业领域（航天、航空 勘探 科学计算 天气）</p>
+<a id="more"></a>
+<h2 id="配置负载均衡集群："><a href="#配置负载均衡集群：" class="headerlink" title="配置负载均衡集群："></a>配置负载均衡集群：</h2><p>1.1 使用ipvsadm软件部署(LVS)<br>1.1.1 软件介绍<br>1.1.2 LVS术语：<br>            RealServer：真正提供服务的主机<br>            DirectorServer：调度服务器，作用是接收客户端访问服务的请求，并根据使用的算法把请求分发给RealServer<br>            VIP 虚拟ip：客户端访问集群时，访问的地址<br>            RIP 真实ip：部署在应用服务器上的IP地址<br>            DIP 直连ip：调度器服务器与应用服务器ip处于同一网络的ip</p>
+<p>1.1.3 LVS工作模式：<br>            NAT模式：地址转换模板*<br>            DR模式：直连路由模式 ** 分发器只负责分发客户端的请求给realserver 直接和客户端通信<br>            TUN模式：隧道模式</p>
+<p>LVS支持10种调度算法 常用4钟：<br>rr 轮询 把请求平均分发给realserver<br>wrr 加权轮询 根据realserver的权重值 分发连接请求<br>lc  最少连接    根据rs当前的连接数分发<br>wlc 加权最少连接    分发时除了看连接数外 还要看 权重值</p>
+<h2 id="配置LVS-NAT模式的负载均衡集群"><a href="#配置LVS-NAT模式的负载均衡集群" class="headerlink" title="配置LVS/NAT模式的负载均衡集群"></a>配置LVS/NAT模式的负载均衡集群</h2><pre><code>    client：2.253
+         |
+      eth1:2.65
+    分发器65 lvs/nat
+     eth0:4.65
+         |
+-------------------
+ |               |
+web62           web63
+ eth0            eth0
+</code></pre><h3 id="配置NAT运行环境"><a href="#配置NAT运行环境" class="headerlink" title="配置NAT运行环境"></a>配置NAT运行环境</h3><ol>
+<li><p>给realserver配置网关地址<br>查看路由：route -n<br>临时：route add/del default gw 192.168.4.65<br>永久：vim /etc/sysconfig/network-scripts/ifcfg-eth0 </p>
+</li>
+<li><p>在分发器65上开启路由转发功能</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">vim /etc/sysctl.conf</span><br><span class="line"> net.ipv4.ip_forward = 1</span><br><span class="line"></span><br><span class="line">sysctl -p</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在RealServer上运行网站 并写编网页</p>
+</li>
+</ol>
+<h3 id="配置LVS-NAT模式的LB集群："><a href="#配置LVS-NAT模式的LB集群：" class="headerlink" title="配置LVS/NAT模式的LB集群："></a>配置LVS/NAT模式的LB集群：</h3><p><em>要求：65主机把接收到的访问网站请求平均分发给网站服务器62.63<br>分发器65配置如下：</em></p>
+<ol>
+<li>装包<blockquote>
+<p>yum install -y ipvsadm<br>service ipvsadm status<br>which ipvsadm<br> -A 添加虚拟服务器<br> -t 设置集群地址（VIP）<br> -s 指定负载调度算法<br> -C 清除配置<br> -a 添加RS<br> -L list<br> -m NAT模式  </p>
+</blockquote>
+</li>
+<li>创建虚拟服务<blockquote>
+<p>ipvsadm -A -t 192.168.2.65:80 -s rr<br>ipvsadm -Ln # 查看  </p>
+</blockquote>
+</li>
+</ol>
+<ol start="3">
+<li>添加RealServer<blockquote>
+<p>ipvsadm -a -t 192.168.2.65:80 -r 192.168.4.62:80 -m<br>ipvsadm -a -t 192.168.2.65:80 -r 192.168.4.63:80 -m<br>ipvsadm -Ln  </p>
+</blockquote>
+</li>
+</ol>
+<ol start="4">
+<li><p>保存设置</p>
+<blockquote>
+<p>service ipvsadm save<br> <em>ipvsadm: Saving IPVS table to /etc/sysconfig/ipvsadm:      [确定]</em><br>cat /etc/sysconfig/ipvsadm<br> -A -t 192.168.2.65:80 -s rr<br> -a -t 192.168.2.65:80 -r 192.168.4.62:80 -m -w 1<br> -a -t 192.168.2.65:80 -r 192.168.4.63:80 -m -w 1  </p>
+</blockquote>
+</li>
+<li><p>在客户端验证<br>!!!! RS 只能有一块网卡eth0<br>curl 192.168.2.65</p>
+</li>
+<li><p>修改设置</p>
+<blockquote>
+<p>ipvsadm -E -t 192.168.2.65:80 -s wrr # 修改调度算法<br>ipvsadm -e -t 192.168.2.65:80 -r 192.168.4.63:80 -w 3 -m # 修改权重值<br>ipvsadm -d -t 192.168.2.65:80 -r 192.168.4.63:80<br>ipvsadm -Z # 访问计数清零，改权后必须<br>ipvsadm -D -t 192.168.2.65:80 # 删除虚拟服务器<br>ipvsadm -C # 清除虚拟服务<br>ipvsadm -Ln<br>service ipvsadm save # 使设置生效</p>
+</blockquote>
+</li>
+</ol>
+<hr>
+<h2 id="配置LVS-DR模式的负载均衡集群"><a href="#配置LVS-DR模式的负载均衡集群" class="headerlink" title="配置LVS/DR模式的负载均衡集群"></a>配置LVS/DR模式的负载均衡集群</h2><pre><code>--------client：4.253------
+|            |            |
+|        eth0:4.100       |
+|       分发器65lvs/dr    |
+|        eth0:4.65        | 
+|            |            |
+---------------------------
+     |               |
+   web62           web63
+    eth0            eth0
+</code></pre><p>环境配置：<br>删除RS网关<br>关闭VS路由转发、eth1网卡  </p>
+<p><em>要求：client通过vip192.168.4.100访问集群62.63 </em></p>
+<ol>
+<li><p>配置RS[62.63]<br>a. 运行网站服务 略<br>b. 绑定VIP  </p>
+<blockquote>
+<p>ifconfig lo:1 192.168.4.100/32<br>echo “ifconfig lo:1 192.168.4.100/32” &gt;&gt; /etc/rc.local #写进开机启动配置  </p>
+</blockquote>
+<p>c. 修改本机网络接口的内核参数<br>cd /proc/sys/net/ipv4/conf<br>vim /etc/rc.local<br>echo 1 &gt; /proc/sys/net/ipv4/conf/lo/arp_ignore<br>echo 2 &gt; /proc/sys/net/ipv4/conf/lo/arp_announce<br>echo 1 &gt; /proc/sys/net/ipv4/conf/all/arp_ignore<br>echo 2 &gt; /proc/sys/net/ipv4/conf/all/arp_announce   </p>
+</li>
+<li><p>配置VS<br>a. 绑定VIP<br>vim /etc/rc.local<br>ifconfig eth0:1 192.168.4.100/32<br>b. 安装LVS软件包<br>rpm -qa ipvsadm<br>c. 创建LVS<br>ipvsadm -A -t 192.168.4.100:80 -s rr<br>d. 添加RS<br>ipvsadm -a -t 192.168.4.100:80 -r 192.168.4.62:80 -g<br>ipvsadm -a -t 192.168.4.100:80 -r 192.168.4.63:80 -g<br>e. 保存设置<br>service ipvsadm save<br>f. 查看配置<br>ipvsadm -Ln<br>ipvsadm -Ln –stats</p>
+</li>
+<li><p>测试<br>访问VIP浏览网页</p>
+</li>
+</ol>
+<h2 id="LVS缺点"><a href="#LVS缺点" class="headerlink" title="LVS缺点"></a>LVS缺点</h2><p>VS单点故障<br>无七层业务负载均衡</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>zhigu34</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://hexo.zhigu34.cn/2018/04/LVS-负载均衡集群搭建/" title="LVS 负载均衡集群搭建">http://hexo.zhigu34.cn/2018/04/LVS-负载均衡集群搭建/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Cluster/" <i class="fa fa-tag"></i> Cluster</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/后端存储/" rel="next" title="ISCSI-后端存储">
+                <i class="fa fa-chevron-left"></i> ISCSI-后端存储
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/Keepalived-高可用集群/" rel="prev" title="Keeplived 高可用集群">
+                Keeplived 高可用集群 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://wx2.sinaimg.cn/large/67634321gy1fq2xzdhsqxg203k03kq2w.gif"
+                alt="zhigu34" />
+            
+              <p class="site-author-name" itemprop="name">zhigu34</p>
+              <p class="site-description motion-element" itemprop="description">To Be Geek</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:zhigu34@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://plus.google.com/zhigu34" target="_blank" title="Google"><i class="fa fa-fw fa-google"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/zhigu34" target="_blank" title="Twitter"><i class="fa fa-fw fa-twitter"></i></a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.viosey.com/" title="Viosey" target="_blank">Viosey</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.nfz.moe/" title="neoFelhz" target="_blank">neoFelhz</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.jeyzhang.com/" title="JeyZhang" target="_blank">JeyZhang</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#配置负载均衡集群："><span class="nav-number">1.</span> <span class="nav-text">配置负载均衡集群：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置LVS-NAT模式的负载均衡集群"><span class="nav-number">2.</span> <span class="nav-text">配置LVS/NAT模式的负载均衡集群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#配置NAT运行环境"><span class="nav-number">2.1.</span> <span class="nav-text">配置NAT运行环境</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#配置LVS-NAT模式的LB集群："><span class="nav-number">2.2.</span> <span class="nav-text">配置LVS/NAT模式的LB集群：</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置LVS-DR模式的负载均衡集群"><span class="nav-number">3.</span> <span class="nav-text">配置LVS/DR模式的负载均衡集群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LVS缺点"><span class="nav-number">4.</span> <span class="nav-text">LVS缺点</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhigu34</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" rel="external nofollow" href="https://pages.coding.me"><b>Coding Pages</b></a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'A0txhlIyiHjgCzx5OcyTiw1L-gzGzoHsz',
+        appKey: 'uoUcP58XEVhRgFxFsbRRYNzo',
+        placeholder: 'Leave your comment here',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

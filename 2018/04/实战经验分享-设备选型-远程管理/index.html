@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=6.1.0" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.1.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.1.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.1.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.1.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":true,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="人称段黄爷的运维大叔XX为我们讲解生产环境中的一些技巧，分享他走过的坎，让我们笑着跨过去…">
+<meta name="keywords" content="Linux运维">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实战经验分享">
+<meta property="og:url" content="http://hexo.zhigu34.cn/2018/04/实战经验分享-设备选型-远程管理/index.html">
+<meta property="og:site_name" content="2ER0">
+<meta property="og:description" content="人称段黄爷的运维大叔XX为我们讲解生产环境中的一些技巧，分享他走过的坎，让我们笑着跨过去…">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://img-blog.csdn.net/20160916110537866">
+<meta property="og:image" content="c:/Users/root/AppData/Local/Temp/1523690800086.png">
+<meta property="og:image" content="c:/Users/root/AppData/Local/Temp/1523690863793.png">
+<meta property="og:updated_time" content="2018-04-28T05:00:15.367Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实战经验分享">
+<meta name="twitter:description" content="人称段黄爷的运维大叔XX为我们讲解生产环境中的一些技巧，分享他走过的坎，让我们笑着跨过去…">
+<meta name="twitter:image" content="https://img-blog.csdn.net/20160916110537866">
+
+
+
+
+
+
+  <link rel="canonical" href="http://hexo.zhigu34.cn/2018/04/实战经验分享-设备选型-远程管理/"/>
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>实战经验分享 | 2ER0</title>
+  
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">2ER0</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">Get up early,Stay up late</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+    <a href="/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-home"></i> <br />首页</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+    <a href="/About/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-user"></i> <br />关于</a>
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+    <a href="/archives/" rel="section">
+      <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />归档</a>
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://hexo.zhigu34.cn/2018/04/实战经验分享-设备选型-远程管理/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zhigu34">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://wx2.sinaimg.cn/large/67634321gy1fq2xzdhsqxg203k03kq2w.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="2ER0">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">实战经验分享
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+                
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-13T00:00:00+08:00">2018-04-13</time>
+            
+
+            
+            
+
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2018/04/实战经验分享-设备选型-远程管理/#comments" itemprop="discussionUrl">
+                  <span class="post-meta-item-text">评论数：</span> <span class="post-comments-count valine-comment-count" data-xid="/2018/04/实战经验分享-设备选型-远程管理/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="post-meta-item-icon"
+            >
+            <i class="fa fa-eye"></i>
+             阅读次数： 
+            <span class="busuanzi-value" id="busuanzi_value_page_pv" ></span>
+            </span>
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>人称段黄爷的运维大叔XX为我们讲解生产环境中的一些技巧，分享他走过的坎，让我们笑着跨过去…</p>
+<p><img src="https://img-blog.csdn.net/20160916110537866" alt="Linux"></p>
+<a id="more"></a>
+<h1 id="远程管理"><a href="#远程管理" class="headerlink" title="远程管理"></a>远程管理</h1><h2 id="设备选型"><a href="#设备选型" class="headerlink" title="设备选型"></a>设备选型</h2><h3 id="课程设置目的"><a href="#课程设置目的" class="headerlink" title="课程设置目的"></a>课程设置目的</h3><p><em>学到的，就是在企业中正在使用的技术，最终架构和配置均可用于实际生产环境。</em></p>
+<h3 id="服务器选择指标"><a href="#服务器选择指标" class="headerlink" title="服务器选择指标"></a>服务器选择指标</h3><ul>
+<li><p>总体上：</p>
+<ul>
+<li>需求决定一切，着眼未来</li>
+<li>不要贪图便宜，电费远比你想的更贵<br>   机房中空间是稀缺资源，机架式比塔式性价比更高（<em>刀片式服务器太贵，性价比低</em>）    </li>
+<li>管理更方便、比如螺丝少、支持亚远程控制（热插拔硬盘）</li>
+<li>硬件通用性要好、尤其驱动</li>
+<li>厂商支持 【大品牌提供，图便宜自找麻烦】</li>
+<li>可替代产品是否广泛 【主流硬件】</li>
+<li>云主机的性价比很高</li>
+<li>CPU是服务器主要指标的一部分，影响cpu性能的主要指标：缓存、主频、核心数、常用Intel-Xeon</li>
+<li>目前的商用服务器大体可以分为三？类，</li>
+<li>即对称多处理器结构 (SMP)</li>
+<li>非一致存储访问结构 (NUMA)</li>
+</ul>
+</li>
+<li><p>SMP服务器</p>
+<ul>
+<li>主要特征：系统中所有资源（CPU、内存、I/O等）都共享。</li>
+<li>问题：<ul>
+<li>扩展能力有限</li>
+<li>内存共享限制大（随着CPU数量增加，内存访问冲突增加，导致CPU资源浪费、有效性降低）</li>
+</ul>
+</li>
+<li>总结：SMP服务器CPU利用率最好：2-4个CPU</li>
+<li><p>总线型结构</p>
+<p><img src="C:\Users\root\AppData\Local\Temp\1523690800086.png" alt="SMP"></p>
+</li>
+</ul>
+</li>
+<li><p>NUMA服务器</p>
+<ul>
+<li><p>基本特征：具有多个CPU模块，每个模块由多个CPU组成，并且具有独立的本地内存、I/O槽口等</p>
+</li>
+<li><p>由于其节点之间可以通过互联模块进行连接和信息交互，因此每个 CPU 可以访问整个系统的内存，显然访问本地内存的速度远高于访问远地内存的速度，这也是非一致存储访问 NUMA 的由来</p>
+<p><img src="C:\Users\root\AppData\Local\Temp\1523690863793.png" alt="NUMA"></p>
+<p>​</p>
+</li>
+</ul>
+</li>
+<li><p>CPU： </p>
+<ul>
+<li>物理核心数量越多，并发性越强，这里不包括超线程，超线程在 cpu 密集型计算，高负载的时候没有任何效果，甚至还会拖慢系统速度</li>
+<li>cpu 主频越高单次计算速度就越快</li>
+<li>cpu L(1、2、3) 缓存大的性能好</li>
+</ul>
+</li>
+<li><p>内存：</p>
+<ul>
+<li>不同主频的不要混插，按照木桶原理所有内存降频到频率最低的内存标准</li>
+<li>多通道的一定按组接入，多 cpu 的要按组对称分布</li>
+<li>一般主板内存槽同组都会标识相同的颜色，在内存槽边上也有数字连线标识</li>
+</ul>
+</li>
+<li><p>raid：</p>
+<ul>
+<li>raid 卡很总要，总的来说贵的好。</li>
+<li>raid 卡自带内存的，IO 会比较强劲</li>
+<li>raid 卡自带电池的，数据安全性好一点</li>
+<li>raid 既带内存，又带电池的 (好)</li>
+<li>硬 raid 比 软 raid 好</li>
+<li>这个硬是指 raid 卡带数据存储和专用cpu</li>
+<li>主板上的 raid 卡多数靠 cpu 计算，没有专用计算芯片</li>
+<li>raid 级别 0、1、5、6、10</li>
+<li>write back（WB,回写） 性能比 write through（WT，直写） 好</li>
+<li>raid 5 磁盘空间大一些，IO 差强人意不适合做数据库</li>
+<li>raid 10 除了空间浪费多一点整体表现都比 raid5 好</li>
+<li>raid 5 磁盘损坏一块以后会有写惩罚，应该及时更换</li>
+<li>DELL Raid卡：H310 &lt; H710 &lt; H710P = H810[多机柜]</li>
+</ul>
+</li>
+<li><p>硬盘：</p>
+<ul>
+<li>硬盘 15000 转的比 10000 转的好</li>
+<li>做 raid 不能混用</li>
+<li>ssd 也不错，贵的好(Intel 的就不错)</li>
+<li>ssd 尤其在随机 IO 读写上性能非常好</li>
+<li>注意如果选择 SSD：<ul>
+<li>在格式化分区的时候要注意 4K 对齐</li>
+<li>在内核队列上选择 noop 效果比较好[echo ‘noop’&gt;/sys/block/sda/queue/scheduler]</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>网卡: 一般主板集成</p>
+</li>
+<li><p>显卡: 在不是专用图像渲染和挖矿的机器上不重要</p>
+</li>
+<li><p>声卡: 有没有都无所谓</p>
+</li>
+<li><p>功耗: 这个要在选配以后大概计算一下，如果选配设备的最大功耗大于电源模块的最大输出就需要考虑配置多个电源了，多个电源有时候不是为了冗余，是因为一个电源根本带不动 ……</p>
+</li>
+<li><p>其他：散热效果是否好，但这个我们可能无能为力</p>
+</li>
+<li><p>广告时间：DELL服务器采用率60%左右，惠普20-30%，国企类多用联想、曙光</p>
+</li>
+</ul>
+<h2 id="XSHELL-机房管理"><a href="#XSHELL-机房管理" class="headerlink" title="XSHELL 机房管理"></a>XSHELL 机房管理</h2><ul>
+<li><p>如何管理机房里面的机器？</p>
+<ol>
+<li>进如机房，连接上显示器，该干嘛干嘛。</li>
+<li>远程使用 ssh<ul>
+<li>ssh 软件 xshell（免费）</li>
+<li>ssh 软件 SecureCRT (收费)</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li>机房的服务器不是全部都有外网地址的。<ul>
+<li>跳板机(堡垒主机)</li>
+<li>VPN [建立加密隧道，相当于专线直连]<br><em>跳板机可以审计，VPN不能</em></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>面试应对</p>
+<ul>
+<li>机房里的机器是如何管理的？<ul>
+<li>需要去机房就去机房，一般通过ssh</li>
+</ul>
+</li>
+<li>你们的机器都是能直接ssh连接的吗？<ul>
+<li>我们跳板机进去</li>
+</ul>
+</li>
+<li>怎么安装软件<ul>
+<li>yum</li>
+</ul>
+</li>
+<li>yum 里没有怎么办？<ul>
+<li>做一个扔进去</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>Xshell 技巧：</p>
+<ul>
+<li>文件传输xftp命令[ctrl+alt+f]：<ul>
+<li>bye 结束连接</li>
+<li>cd、clear、exit、ls、mkdir、rm 同 shell 命令</li>
+<li>get 下载文件</li>
+<li>put 上传文件</li>
+<li>lcd 选择本地目录</li>
+<li>lls 显示本地目录文件</li>
+<li>lpwd显示本地目录</li>
+</ul>
+</li>
+<li>文件传输zmodem<ul>
+<li>远程服务器装包：yum install -y lrzsz</li>
+<li>上传文件：rz || 直接拖拽到窗口</li>
+<li>下载文件：sz /etc/passwd [指定下载目录或当前目录]</li>
+<li><em>不可传输空文件</em></li>
+</ul>
+</li>
+<li>socks5 隧道 [代理上网]<ul>
+<li>选择远程服务器属性 - 隧道</li>
+<li>选择socks5</li>
+<li>端口</li>
+<li>完成后断开重连</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="IPMI"><a href="#IPMI" class="headerlink" title="IPMI"></a>IPMI</h2><ul>
+<li><p>远程服务器管理问题：</p>
+<ul>
+<li>如果服务器的系统崩溃了怎么办？</li>
+<li>想重新安装系统怎么办？</li>
+<li>想重新做 raid 怎么办？</li>
+<li>系统出现故障，想要救援数据怎么办？</li>
+<li>怎么获得系统，硬盘、raid、内存、CPU的状态 ？</li>
+<li>硬件出现故障怎么能第一时间知道？</li>
+</ul>
+</li>
+<li><p>解决方案——IPMI：<br>  IPMI是为服务器管理设计的一种工业标准。为了解决服务器远程管理标准化，最初由Intel 、HP、Dell、NEC等公司于1998年共同提出。<br>  IPMI标准的推出，使不同产品的集中管理成为可能。<br>  IPMI让用户可以通过网络来监控服务器上各种硬件组件的健康状况，如CPU电压、风扇转速、系统温度、功<br>  耗等。<br>  IPMI 还可以检测电源状态，可以下达开、关机或重启指令。IPMI的核心是基板控制器（BMC），其完全独立于服务器的CPU、BIOS、操作系统、开关机状态之外，是一个完全独立运行的系统。<br>  IPMI 功能通过向 BMC 发送指令完成，指令附合 IPMI规范。很多硬件厂商（DELL、HP、IBM）都提供了服务器带外管理工具。</p>
+<p>  Dell 的 iDrac 工具在不购买远程管理卡的情况下，默认就可以提供，可以实现远程重启服务器，查询服务器状态，温度，文本模式串口终端重定向等等，这些极大的方便了我们远程管理服务器，这种方式的优势就是不依赖于系统，即使在没有开机的情况下，我们依然可以使用大部分功能</p>
+</li>
+<li><p>DELL iDRAC BMC 使用<br>  首先机器进入机房以后我们应该对 iDRAC BMC 进程初始化，配置用户名，密码和管理地址<br>  BMC 出厂默认配置地址 192.168.1.120<br>  BMC 出厂默认用户名 root<br>  BMC 出厂默认密码 calvin<br>  Linux 管理 IPMI 的命令是 ipmitool</p>
+</li>
+<li><p>ipmitool 命令：<br>  ipmitool [ <options> ] <command> [ <sub-commands and="" sub-options=""> ]<br>  常用参数介绍<br>  -U username 登录的用户名<br>  -P password 登录的密码<br>  -H hostname 远程主机地址<br>  power 电源管理模块<br>  sel 硬件日志管理<br>  sol 串口重定向</sub-commands></options></p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+
+    
+      <div>
+        <ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>zhigu34</li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="http://hexo.zhigu34.cn/2018/04/实战经验分享-设备选型-远程管理/" title="实战经验分享">http://hexo.zhigu34.cn/2018/04/实战经验分享-设备选型-远程管理/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="external nofollow" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明出处！</li>
+</ul>
+
+      </div>
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Linux运维/" <i class="fa fa-tag"></i> Linux运维</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/Monitor-012-Nagios/" rel="next" title="Nagios">
+                <i class="fa fa-chevron-left"></i> Nagios
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/后端存储/" rel="prev" title="ISCSI-后端存储">
+                ISCSI-后端存储 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="https://wx2.sinaimg.cn/large/67634321gy1fq2xzdhsqxg203k03kq2w.gif"
+                alt="zhigu34" />
+            
+              <p class="site-author-name" itemprop="name">zhigu34</p>
+              <p class="site-description motion-element" itemprop="description">To Be Geek</p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">18</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  <a href="mailto:zhigu34@gmail.com" target="_blank" title="E-Mail"><i class="fa fa-fw fa-envelope"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://plus.google.com/zhigu34" target="_blank" title="Google"><i class="fa fa-fw fa-google"></i></a>
+                  
+                </span>
+              
+                <span class="links-of-author-item">
+                  <a href="https://twitter.com/zhigu34" target="_blank" title="Twitter"><i class="fa fa-fw fa-twitter"></i></a>
+                  
+                </span>
+              
+            </div>
+          
+
+          
+          
+
+          
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-inline">
+              <div class="links-of-blogroll-title">
+                <i class="fa  fa-fw fa-link"></i>
+                Links
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.viosey.com/" title="Viosey" target="_blank">Viosey</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="https://blog.nfz.moe/" title="neoFelhz" target="_blank">neoFelhz</a>
+                  </li>
+                
+                  <li class="links-of-blogroll-item">
+                    <a href="http://www.jeyzhang.com/" title="JeyZhang" target="_blank">JeyZhang</a>
+                  </li>
+                
+              </ul>
+            </div>
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#远程管理"><span class="nav-number">1.</span> <span class="nav-text">远程管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#设备选型"><span class="nav-number">1.1.</span> <span class="nav-text">设备选型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#课程设置目的"><span class="nav-number">1.1.1.</span> <span class="nav-text">课程设置目的</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#服务器选择指标"><span class="nav-number">1.1.2.</span> <span class="nav-text">服务器选择指标</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XSHELL-机房管理"><span class="nav-number">1.2.</span> <span class="nav-text">XSHELL 机房管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#IPMI"><span class="nav-number">1.3.</span> <span class="nav-text">IPMI</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+        <div class="back-to-top">
+          <i class="fa fa-arrow-up"></i>
+          
+        </div>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zhigu34</span>
+
+  
+
+  
+</div>
+
+
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+
+
+
+
+  <div class="footer-custom">Hosted by <a target="_blank" rel="external nofollow" href="https://pages.coding.me"><b>Coding Pages</b></a></div>
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv" title="总访客量">
+      <i class="fa fa-user"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+
+  
+    <span class="site-pv" title="总访问量">
+      <i class="fa fa-eye"></i>
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.1.0"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=6.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=6.1.0"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.1.0"></script>
+
+
+
+  
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+  
+  
+  <script src="//unpkg.com/valine/dist/Valine.min.js"></script>
+  
+  <script type="text/javascript">
+    var GUEST = ['nick','mail','link'];
+    var guest = 'nick,mail,link';
+    guest = guest.split(',').filter(function (item) {
+      return GUEST.indexOf(item)>-1;
+    });
+    new Valine({
+        el: '#comments' ,
+        verify: false,
+        notify: false,
+        appId: 'A0txhlIyiHjgCzx5OcyTiw1L-gzGzoHsz',
+        appKey: 'uoUcP58XEVhRgFxFsbRRYNzo',
+        placeholder: 'Leave your comment here',
+        avatar:'mm',
+        guest_info:guest,
+        pageSize:'10' || 10,
+    });
+  </script>
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
